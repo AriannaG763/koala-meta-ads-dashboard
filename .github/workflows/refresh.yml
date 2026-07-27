@@ -1,0 +1,73 @@
+name: Refresh dashboard
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch fresh data
+        run: |
+          curl -sS -f -L "https://docs.google.com/spreadsheets/d/1-yh66Yj4PVBH3nFpHnUnTFv1lIoB8rMzsJ9sy9WRjno/gviz/tq?tqx=out:csv&sheet=Target%20CAC" -o target_cac.csv
+          curl -sS -f -L "https://docs.google.com/spreadsheets/d/1-yh66Yj4PVBH3nFpHnUnTFv1lIoB8rMzsJ9sy9WRjno/gviz/tq?tqx=out:csv&sheet=Dati%20Meta" -o dati_meta.csv
+          wc -l target_cac.csv dati_meta.csv
+          head -1 target_cac.csv
+          head -1 dati_meta.csv
+
+      - name: Aggregate
+        run: node aggregate.js target_cac.csv dati_meta.csv .
+
+      - name: Build
+        run: python3 build.py .
+
+      - name: Validate
+        run: |
+          python3 -c "
+          import re
+          with open('meta-ads-dashboard.html') as f:
+              html = f.read()
+          assert '__PRODUCTS_META_JSON__' not in html
+          assert '__DAILY_JSON__' not in html
+          assert '__GEN_DATE__' not in html
+          m = re.search(r'<script>(.*)</script>', html, re.S)
+          with open('extracted.js', 'w') as out:
+              out.write(m.group(1))
+          "
+          node --check extracted.js
+
+      - name: Prepare Pages output
+        run: |
+          mkdir -p _site
+          cp meta-ads-dashboard.html _site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

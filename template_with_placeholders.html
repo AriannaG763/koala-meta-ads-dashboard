@@ -1,0 +1,1005 @@
+<title>Koalababycare — Meta Ads: Spesa per Prodotto</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper:      #f8f7f4;
+  --surface:    #ffffff;
+  --border:     rgba(20,22,20,0.09);
+  --ink:        #16181a;
+  --ink-2:      #565a54;
+  --ink-muted:  #8a8d86;
+  --accent:     #3c6e71;
+  --accent-ink: #ffffff;
+  --accent-wash:#e4eeed;
+  --good:      #0ca30c;
+  --good-wash: #e5f6e1;
+  --warning:   #b9790a;
+  --warning-wash: #fdf1d9;
+  --critical:  #d03b3b;
+  --critical-wash: #fbe7e5;
+  --grid:      #e6e4de;
+  --prod-1: #2a78d6;
+  --prod-2: #eb6834;
+  --prod-3: #1baf7a;
+  --prod-4: #eda100;
+  --prod-5: #e87ba4;
+  --prod-6: #4a3aa7;
+  --prod-7: #e34948;
+  --prod-8: #0aa3a3;
+  --prod-9: #6a5acd;
+  --prod-muted: #b7b9b2;
+  --shadow: 0 1px 2px rgba(20,22,20,0.04), 0 8px 24px -12px rgba(20,22,20,0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --paper:      #101112;
+    --surface:    #17181a;
+    --border:     rgba(255,255,255,0.09);
+    --ink:        #f3f3f1;
+    --ink-2:      #bcbdb6;
+    --ink-muted:  #85877f;
+    --accent:     #6bb0ac;
+    --accent-ink: #0d1413;
+    --accent-wash:#1a2827;
+    --good:      #33c733;
+    --good-wash: #12261a;
+    --warning:   #e0a530;
+    --warning-wash: #2a2213;
+    --critical:  #e66767;
+    --critical-wash: #2c1717;
+    --grid:      #26272a;
+    --prod-1: #3987e5;
+    --prod-2: #c96a30;
+    --prod-3: #199e70;
+    --prod-4: #c98500;
+    --prod-5: #d55181;
+    --prod-6: #9085e9;
+    --prod-7: #e66767;
+    --prod-8: #23a3a3;
+    --prod-9: #8577e0;
+    --prod-muted: #4a4c47;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper:      #101112;
+  --surface:    #17181a;
+  --border:     rgba(255,255,255,0.09);
+  --ink:        #f3f3f1;
+  --ink-2:      #bcbdb6;
+  --ink-muted:  #85877f;
+  --accent:     #6bb0ac;
+  --accent-ink: #0d1413;
+  --accent-wash:#1a2827;
+  --good:      #33c733;
+  --good-wash: #12261a;
+  --warning:   #e0a530;
+  --warning-wash: #2a2213;
+  --critical:  #e66767;
+  --critical-wash: #2c1717;
+  --grid:      #26272a;
+  --prod-1: #3987e5;
+  --prod-2: #c96a30;
+  --prod-3: #199e70;
+  --prod-4: #c98500;
+  --prod-5: #d55181;
+  --prod-6: #9085e9;
+  --prod-7: #e66767;
+  --prod-8: #23a3a3;
+  --prod-9: #8577e0;
+  --prod-muted: #4a4c47;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding: 28px 20px 64px;
+}
+a { color: inherit; }
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+
+.masthead {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+.masthead .id { display: flex; align-items: center; gap: 12px; }
+.mark {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--accent); color: var(--accent-ink);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; flex: none;
+}
+h1 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.sub { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+.snapshot { text-align: right; font-size: 12.5px; color: var(--ink-muted); line-height: 1.5; }
+.snapshot strong { color: var(--ink-2); font-weight: 600; }
+.live-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background: var(--good); margin-right: 5px; box-shadow: 0 0 0 2px var(--good-wash); }
+
+.trend-controls { display: flex; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; align-items: center; }
+.metric-toggle { display: flex; gap: 4px; background: var(--paper); border: 1px solid var(--border); border-radius: 8px; padding: 3px; margin-left: auto; }
+.metric-btn {
+  font: inherit; font-size: 12.5px; font-weight: 600; color: var(--ink-2); background: none; border: none;
+  border-radius: 6px; padding: 6px 12px; cursor: pointer;
+}
+.metric-btn.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: var(--shadow); padding: 18px 20px 16px;
+}
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+.panel-title { font-size: 14.5px; font-weight: 700; }
+.panel-note { font-size: 12px; color: var(--ink-muted); }
+
+.chart-wrap { position: relative; }
+svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.axis-label { fill: var(--ink-muted); font-size: 10.5px; }
+.gridline { stroke: var(--grid); stroke-width: 1; }
+.hover-col { fill: transparent; }
+.crosshair { stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; pointer-events: none; }
+.dot-main { r: 3.5; opacity: 0; pointer-events: none; }
+
+.tooltip {
+  position: absolute; pointer-events: none; background: var(--ink); color: var(--paper);
+  font-size: 12px; padding: 8px 10px; border-radius: 8px; line-height: 1.5; opacity: 0; transform: translate(-50%, -100%);
+  transition: opacity 0.08s ease; white-space: nowrap; z-index: 5; box-shadow: var(--shadow);
+}
+.tooltip .t-date { font-weight: 700; margin-bottom: 3px; }
+.tooltip .t-row { display: flex; justify-content: space-between; gap: 14px; }
+.tooltip .t-row .k { color: var(--ink-muted); }
+
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-muted); font-weight: 600; padding: 0 10px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.detail-warning {
+  display: flex; gap: 8px; font-size: 12.5px; color: var(--ink-2); background: var(--paper);
+  border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin: 4px 0 14px; line-height: 1.5;
+}
+.detail-controls { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.search-input, .cat-select {
+  font: inherit; font-size: 13px; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+}
+.search-input { flex: 1; min-width: 180px; }
+.search-input:focus, .cat-select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.cat-select { min-width: 170px; }
+.detail-expand-buttons { display: flex; gap: 8px; margin-left: auto; }
+.ghost-btn {
+  font: inherit; font-size: 12.5px; font-weight: 600; color: var(--ink-2); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; cursor: pointer;
+}
+.ghost-btn:hover { color: var(--ink); border-color: var(--ink-muted); }
+.ghost-btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.cat-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.cat-pill .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+
+.date-range-panel { padding: 16px 20px; }
+.date-range-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 12px; }
+.date-field { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--ink-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.date-field input[type="date"] {
+  font: inherit; font-size: 13px; color: var(--ink); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; text-transform: none; letter-spacing: normal; font-weight: 400;
+}
+.date-range-summary { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.date-range-presets { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* KPI tiles */
+.kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.kpi-tile {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow);
+  padding: 16px 18px;
+}
+.kpi-label { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-muted); }
+.kpi-value { font-size: 25px; font-weight: 700; letter-spacing: -0.01em; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.kpi-sub { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+@media (max-width: 860px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+
+/* Spend-by-product bar list */
+.bar-list-head {
+  display: grid; grid-template-columns: 190px 1fr 108px 150px; gap: 12px; margin-top: 10px;
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-muted);
+}
+.bar-list-head span:nth-child(3), .bar-list-head span:nth-child(4) { text-align: right; }
+.bar-list { display: flex; flex-direction: column; gap: 11px; margin-top: 6px; }
+.bar-row { display: grid; grid-template-columns: 190px 1fr 108px 150px; align-items: center; gap: 12px; }
+.bar-name { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; overflow: hidden; }
+.bar-name .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.bar-name .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.new-badge {
+  font-size: 9.5px; font-weight: 700; color: var(--accent); background: var(--accent-wash);
+  border-radius: 4px; padding: 1.5px 5px; letter-spacing: 0.03em; flex: none;
+}
+.bar-track { position: relative; height: 20px; background: var(--paper); border-radius: 5px; overflow: visible; }
+.bar-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 5px; min-width: 3px; }
+.bar-target-tick {
+  position: absolute; top: -3px; width: 2px; height: 26px; background: var(--ink);
+  opacity: 0.55; border-radius: 1px;
+}
+.bar-values { text-align: right; font-variant-numeric: tabular-nums; font-size: 12.5px; }
+.bar-values .pct { color: var(--ink-muted); font-size: 11.5px; margin-left: 5px; }
+.bar-cac { text-align: right; font-variant-numeric: tabular-nums; }
+.bar-cac .cac-pill { display: inline-block; }
+.bar-legend-note { font-size: 12px; color: var(--ink-muted); margin-top: 12px; display: flex; align-items: center; gap: 7px; }
+.bar-legend-note .tick-swatch { width: 2px; height: 12px; background: var(--ink); opacity: 0.55; display: inline-block; }
+
+.zero-spend-strip { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.zero-spend-title { font-size: 12px; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 9px; }
+.zero-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.zero-pill {
+  font-size: 12px; color: var(--ink-2); background: var(--paper); border: 1px dashed var(--border);
+  border-radius: 7px; padding: 6px 10px; display: flex; align-items: center; gap: 6px;
+}
+.zero-pill .budget-note { color: var(--ink-muted); font-size: 11px; }
+
+/* tree rows */
+#detailTable .row-toggle {
+  display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px;
+  border: none; background: none; cursor: pointer; color: var(--ink-muted); font-size: 10px; flex: none;
+  transition: transform 0.12s ease;
+}
+#detailTable .row-toggle.open { transform: rotate(90deg); }
+#detailTable tr.row-product { background: var(--paper); cursor: pointer; }
+#detailTable tr.row-product .name-cell { font-weight: 700; font-size: 13.5px; align-items: flex-start; }
+#detailTable tr.row-product td { border-bottom: 1px solid var(--border); }
+#detailTable tr.row-country .name-cell { padding-left: 30px; color: var(--ink-2); font-size: 12.5px; }
+#detailTable tr.row-product:hover { background: var(--accent-wash); }
+#detailTable tr.row-total { background: var(--paper); }
+#detailTable tr.row-total td { font-weight: 700; }
+#detailTable tr.row-total.row-metric-primary td { border-top: 2px solid var(--border); }
+#detailTable tr.row-total .name-cell { font-weight: 700; font-size: 13.5px; }
+#detailTable .name-cell { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+#detailTable .name-main { display: flex; align-items: center; gap: 6px; }
+#detailTable .name-badges { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-left: 22px; margin-top: 2px; width: 100%; }
+#detailTable .count-badge { color: var(--ink-muted); font-weight: 400; font-size: 11.5px; }
+#detailTable th.detail-metric-col, #detailTable td.detail-metric-col {
+  color: var(--ink-muted); font-size: 11px; border-right: 1px solid var(--border); white-space: nowrap;
+}
+#detailTable th.detail-date-col, #detailTable td.detail-date-col {
+  text-align: right; font-variant-numeric: tabular-nums; font-size: 11px; padding: 6px 8px; white-space: nowrap;
+}
+#detailTable th.detail-total-col, #detailTable td.detail-total-col {
+  text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; padding: 6px 10px;
+  border-left: 1px solid var(--border); background: var(--paper); white-space: nowrap;
+}
+#detailTable tr.row-metric-primary td { border-bottom: none; }
+#detailTable .zero-val { color: var(--ink-muted); }
+
+.cac-pill {
+  font-size: 11px; font-weight: 600; border-radius: 5px; padding: 2px 7px; white-space: nowrap;
+}
+.cac-pill.status-good { color: var(--good); background: var(--good-wash); }
+.cac-pill.status-warning { color: var(--warning); background: var(--warning-wash); }
+.cac-pill.status-critical { color: var(--critical); background: var(--critical-wash); }
+.cac-pill.status-muted { color: var(--ink-muted); background: var(--paper); }
+.quota-pill { font-size: 11px; color: var(--ink-muted); background: var(--paper); border-radius: 5px; padding: 2px 7px; white-space: nowrap; }
+
+footer { font-size: 12px; color: var(--ink-muted); text-align: center; padding-top: 8px; line-height: 1.7; }
+footer a { text-decoration: underline; text-underline-offset: 2px; }
+</style>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="id">
+      <div class="mark">K</div>
+      <div>
+        <h1>Koalababycare &mdash; Meta Ads: Spesa per Prodotto</h1>
+        <div class="sub">koalababycare.com &middot; Meta Ads &middot; valori in EUR</div>
+      </div>
+    </div>
+    <div class="snapshot">
+      <div><span class="live-dot"></span>Istantanea generata il <strong id="genDate">&mdash;</strong></div>
+      <div>Il periodo si seleziona qui sotto &middot; non si aggiorna da sola, va ripubblicata</div>
+    </div>
+  </div>
+
+  <div class="panel date-range-panel">
+    <div class="date-range-row">
+      <label class="date-field">Dal <input type="date" id="dateFrom"></label>
+      <label class="date-field">Al <input type="date" id="dateTo"></label>
+      <span class="date-range-summary" id="dateRangeSummary"></span>
+    </div>
+    <div class="date-range-presets">
+      <button type="button" class="ghost-btn" data-preset="yesterday">Ieri</button>
+      <button type="button" class="ghost-btn" data-preset="last3">Ultimi 3 giorni</button>
+      <button type="button" class="ghost-btn" data-preset="last7">Ultimi 7 giorni</button>
+      <button type="button" class="ghost-btn" data-preset="last14">Ultimi 14 giorni</button>
+      <button type="button" class="ghost-btn" data-preset="last30">Ultimi 30 giorni</button>
+      <button type="button" class="ghost-btn" data-preset="mtd">Da inizio mese</button>
+      <button type="button" class="ghost-btn" data-preset="last3m">Ultimi 3 mesi</button>
+      <button type="button" class="ghost-btn" data-preset="ytd">Da inizio anno</button>
+      <button type="button" class="ghost-btn" data-preset="all">Tutto il periodo</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-tile">
+      <div class="kpi-label">Spesa totale Meta Ads</div>
+      <div class="kpi-value" id="kpiSpend">&mdash;</div>
+      <div class="kpi-sub" id="kpiSpendSub">&nbsp;</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Acquisti totali (Meta)</div>
+      <div class="kpi-value" id="kpiPurchases">&mdash;</div>
+      <div class="kpi-sub" id="kpiPurchasesSub">&nbsp;</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">CAC medio (Meta)</div>
+      <div class="kpi-value" id="kpiCac">&mdash;</div>
+      <div class="kpi-sub" id="kpiCacSub">Target: &euro; 40,00</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Spesa Meta Ads per prodotto</div>
+        <div class="panel-note">Quota della spesa totale del periodo selezionato, per prodotto</div>
+      </div>
+    </div>
+    <div class="detail-warning">
+      Elenco prodotti dal foglio Google &quot;Target CAC&quot; (colonna A) &middot; spesa e acquisti dal foglio &quot;Dati Meta&quot;.
+    </div>
+    <div class="bar-list-head">
+      <span></span><span></span><span>Spesa</span><span>CAC (Meta)</span>
+    </div>
+    <div class="bar-list" id="barList"></div>
+    <div class="bar-legend-note"><span class="tick-swatch"></span> Segno = quota di budget pianificata per il prodotto (foglio &quot;Target CAC&quot;) &middot; colore del CAC = rispetto al target &euro; 40,00 (verde sotto, giallo in linea, rosso sopra)</div>
+    <div class="zero-spend-strip" id="zeroSpendStrip" style="display:none;">
+      <div class="zero-spend-title">Prodotti a catalogo senza spesa Meta nel periodo</div>
+      <div class="zero-pills" id="zeroPills"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Andamento spesa giornaliera</div>
+      </div>
+    </div>
+    <div class="trend-controls">
+      <select id="trendProduct" class="cat-select"></select>
+      <div class="metric-toggle">
+        <button type="button" class="metric-btn active" data-metric="spend">Spesa</button>
+        <button type="button" class="metric-btn" data-metric="purchases">Acquisti</button>
+        <button type="button" class="metric-btn" data-metric="cac">CAC</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <svg class="chart" id="trendChart" viewBox="0 0 960 300" preserveAspectRatio="none"></svg>
+      <div class="tooltip" id="trendTooltip"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Dettaglio spesa per prodotto e paese</div>
+        <div class="panel-note">Fonte: foglio Google &quot;Dati Meta&quot; &middot; CAC = Spesa / Acquisti attribuiti da Meta</div>
+      </div>
+      <div class="panel-note" id="detailCount"></div>
+    </div>
+    <div class="detail-controls">
+      <input type="text" id="detailSearch" class="search-input" placeholder="Cerca prodotto o paese&hellip;">
+      <select id="detailCountry" class="cat-select"></select>
+      <select id="detailSortBy" class="cat-select">
+        <option value="spend">Ordina per spesa</option>
+        <option value="purchases">Ordina per acquisti</option>
+        <option value="name">Ordina alfabeticamente</option>
+      </select>
+      <div class="detail-expand-buttons">
+        <button type="button" id="expandAllBtn" class="ghost-btn">Espandi tutto</button>
+        <button type="button" id="collapseAllBtn" class="ghost-btn">Comprimi tutto</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table id="detailTable">
+        <thead>
+          <tr id="detailHeadRow">
+            <th class="detail-name-col">Prodotto &rsaquo; Paese</th>
+            <th class="detail-metric-col">Metrica</th>
+          </tr>
+        </thead>
+        <tbody id="detailBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    Dati aggregati dai fogli Google &quot;Dati Meta&quot; e &quot;Target CAC&quot; &middot; questa &egrave; un&#39;istantanea statica, non un collegamento live.<br>
+    Per tenerla aggiornata, ripubblicare periodicamente con dati freschi.
+  </footer>
+</div>
+<script>
+(function () {
+  var fmtEUR = function (n, decimals) {
+    if (n === null || n === undefined || isNaN(n)) return '–';
+    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: decimals === undefined ? 2 : decimals, maximumFractionDigits: decimals === undefined ? 2 : decimals }).format(n);
+  };
+  var fmtInt = function (n) { return new Intl.NumberFormat('it-IT').format(Math.round(n)); };
+  var fmtPct = function (n, decimals) {
+    if (n === null || n === undefined || isNaN(n)) return '–';
+    return new Intl.NumberFormat('it-IT', { minimumFractionDigits: decimals === undefined ? 1 : decimals, maximumFractionDigits: decimals === undefined ? 1 : decimals }).format(n) + '%';
+  };
+
+  var PRODUCTS_META = __PRODUCTS_META_JSON__;
+  var DAILY = __DAILY_JSON__; // [date, product, country, spend, purchases]
+
+  (function () {
+    var lastDate = DAILY.reduce(function (max, r) { return r[0] > max ? r[0] : max; }, DAILY[0] ? DAILY[0][0] : '');
+    var dt = lastDate ? new Date(lastDate + 'T00:00:00Z') : null;
+    var lastDateIt = dt ? dt.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+    document.getElementById('genDate').textContent = '__GEN_DATE__, snapshot dati fino al ' + lastDateIt;
+  })();
+
+  var PRODUCT_META_BY_NAME = {};
+  PRODUCTS_META.forEach(function (p) { PRODUCT_META_BY_NAME[p.name] = p; });
+
+  var PRODUCT_COLORS = {
+    'Cuddle Band 2': 'var(--prod-1)',
+    'Other': 'var(--prod-2)',
+    'Hugs': 'var(--prod-3)',
+    'Bundle': 'var(--prod-4)',
+    'Cuddle Breeze': 'var(--prod-5)',
+    'All Products Carousel': 'var(--prod-6)',
+    'Cuddle Carry': 'var(--prod-7)',
+    'Caddy Bag + Nec': 'var(--prod-8)',
+    'Silver Cups': 'var(--prod-9)'
+  };
+  function colorFor(name) { return PRODUCT_COLORS[name] || 'var(--prod-muted)'; }
+
+  var COUNTRY_LABELS = { AT: 'Austria (AT)', DE: 'Germania (DE)', ES: 'Spagna (ES)', FR: 'Francia (FR)', IT: 'Italia (IT)', unknown: 'Non specificato' };
+  function countryLabel(c) { return COUNTRY_LABELS[c] || c; }
+
+  var PRODUCTS_WITH_DATA = Array.from(new Set(DAILY.map(function (r) { return r[1]; })));
+
+  // ---------- Shared date-range state ----------
+  var DASH = { start: null, end: null, minDate: null, maxDate: null, rerenders: [] };
+
+  function addDaysStr(dateStr, delta) {
+    var d = new Date(dateStr + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + delta);
+    return d.toISOString().slice(0, 10);
+  }
+  function addMonthsStr(dateStr, delta) {
+    var d = new Date(dateStr + 'T00:00:00Z');
+    d.setUTCMonth(d.getUTCMonth() + delta);
+    return d.toISOString().slice(0, 10);
+  }
+  function startOfMonthStr(dateStr) { return dateStr.slice(0, 7) + '-01'; }
+  function startOfYearStr(dateStr) { return dateStr.slice(0, 4) + '-01-01'; }
+  function dateRangeList(start, end) {
+    var out = [], cur = start, guard = 0;
+    while (cur <= end && guard < 5000) { out.push(cur); cur = addDaysStr(cur, 1); guard++; }
+    return out;
+  }
+  function fmtItDate(dateStr) {
+    var d = new Date(dateStr + 'T00:00:00Z');
+    return String(d.getUTCDate()).padStart(2, '0') + '/' + String(d.getUTCMonth() + 1).padStart(2, '0') + '/' + d.getUTCFullYear();
+  }
+  function dashRerenderAll() { DASH.rerenders.forEach(function (fn) { fn(); }); }
+
+  function cacStatus(cac, target) {
+    if (!target || cac === null || cac === undefined || isNaN(cac)) return 'muted';
+    var ratio = cac / target;
+    if (ratio <= 1.0) return 'good';
+    if (ratio <= 1.25) return 'warning';
+    return 'critical';
+  }
+
+  // ---------- Date range picker ----------
+  (function () {
+    var fromInput = document.getElementById('dateFrom');
+    var toInput = document.getElementById('dateTo');
+    var summary = document.getElementById('dateRangeSummary');
+    var presetBtns = Array.prototype.slice.call(document.querySelectorAll('.date-range-presets .ghost-btn'));
+
+    var seen = {};
+    DAILY.forEach(function (r) { seen[r[0]] = true; });
+    var sortedDates = Object.keys(seen).sort();
+    DASH.minDate = sortedDates[0];
+    DASH.maxDate = sortedDates[sortedDates.length - 1];
+    fromInput.min = toInput.min = DASH.minDate;
+    fromInput.max = toInput.max = DASH.maxDate;
+
+    function updateSummary() {
+      var days = Math.round((new Date(DASH.end + 'T00:00:00Z') - new Date(DASH.start + 'T00:00:00Z')) / 86400000) + 1;
+      var rows = DAILY.filter(function (r) { return r[0] >= DASH.start && r[0] <= DASH.end; }).length;
+      summary.textContent = fmtItDate(DASH.start) + ' → ' + fmtItDate(DASH.end) + ' (' + days + ' giorni, ' + fmtInt(rows) + ' righe)';
+    }
+
+    function setRange(start, end, presetName) {
+      DASH.start = start; DASH.end = end;
+      fromInput.value = start; toInput.value = end;
+      presetBtns.forEach(function (b) { b.classList.toggle('active', presetName !== null && b.getAttribute('data-preset') === presetName); });
+      updateSummary();
+      dashRerenderAll();
+    }
+
+    function presetRange(name) {
+      var max = DASH.maxDate, min = DASH.minDate, s;
+      if (name === 'yesterday') { s = addDaysStr(max, -1); setRange(s, s, name); return; }
+      if (name === 'last3') s = addDaysStr(max, -2);
+      else if (name === 'last7') s = addDaysStr(max, -6);
+      else if (name === 'last14') s = addDaysStr(max, -13);
+      else if (name === 'last30') s = addDaysStr(max, -29);
+      else if (name === 'mtd') s = startOfMonthStr(max);
+      else if (name === 'last3m') s = addMonthsStr(max, -3);
+      else if (name === 'ytd') s = startOfYearStr(max);
+      else s = min; // 'all'
+      if (s < min) s = min;
+      setRange(s, max, name);
+    }
+
+    presetBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () { presetRange(btn.getAttribute('data-preset')); });
+    });
+    fromInput.addEventListener('change', function () { if (fromInput.value) setRange(fromInput.value, toInput.value || DASH.end, null); });
+    toInput.addEventListener('change', function () { if (toInput.value) setRange(fromInput.value || DASH.start, toInput.value, null); });
+
+    presetRange('last30');
+  })();
+
+  // ---------- KPI tiles ----------
+  (function () {
+    var elSpend = document.getElementById('kpiSpend');
+    var elSpendSub = document.getElementById('kpiSpendSub');
+    var elPurchases = document.getElementById('kpiPurchases');
+    var elPurchasesSub = document.getElementById('kpiPurchasesSub');
+    var elCac = document.getElementById('kpiCac');
+
+    function render() {
+      var rows = DAILY.filter(function (r) { return r[0] >= DASH.start && r[0] <= DASH.end; });
+      var totalSpend = 0, totalPurchases = 0;
+      rows.forEach(function (r) {
+        totalSpend += r[3]; totalPurchases += r[4];
+      });
+      var days = Math.round((new Date(DASH.end + 'T00:00:00Z') - new Date(DASH.start + 'T00:00:00Z')) / 86400000) + 1;
+
+      elSpend.textContent = fmtEUR(totalSpend, 0);
+      elSpendSub.textContent = 'su ' + days + ' giorni · media ' + fmtEUR(totalSpend / days, 0) + '/giorno';
+      elPurchases.textContent = fmtInt(totalPurchases);
+      elPurchasesSub.textContent = totalPurchases ? fmtEUR(totalSpend / totalPurchases, 2) + ' CAC medio' : 'nessun acquisto nel periodo';
+      elCac.textContent = totalPurchases ? fmtEUR(totalSpend / totalPurchases, 2) : '–';
+    }
+
+    DASH.rerenders.push(render);
+    render();
+  })();
+
+  // ---------- Spend-by-product bar list ----------
+  (function () {
+    var barList = document.getElementById('barList');
+    var zeroStrip = document.getElementById('zeroSpendStrip');
+    var zeroPills = document.getElementById('zeroPills');
+
+    function render() {
+      var rows = DAILY.filter(function (r) { return r[0] >= DASH.start && r[0] <= DASH.end; });
+      var totals = {};
+      PRODUCTS_META.forEach(function (p) { totals[p.name] = { spend: 0, purchases: 0 }; });
+      rows.forEach(function (r) {
+        if (!totals[r[1]]) totals[r[1]] = { spend: 0, purchases: 0 };
+        totals[r[1]].spend += r[3];
+        totals[r[1]].purchases += r[4];
+      });
+      var totalSpend = 0;
+      Object.keys(totals).forEach(function (k) { totalSpend += totals[k].spend; });
+
+      var active = PRODUCTS_META.filter(function (p) { return totals[p.name].spend > 0; })
+        .sort(function (a, b) { return totals[b.name].spend - totals[a.name].spend; });
+      var zero = PRODUCTS_META.filter(function (p) { return totals[p.name].spend === 0; });
+
+      var maxSpend = active.length ? totals[active[0].name].spend : 1;
+
+      barList.innerHTML = active.map(function (p) {
+        var t = totals[p.name];
+        var pct = totalSpend ? (t.spend / totalSpend * 100) : 0;
+        var widthPct = (t.spend / maxSpend * 100);
+        var tickHtml = (p.budgetPct !== null && p.budgetPct !== undefined)
+          ? '<div class="bar-target-tick" style="left:' + Math.min(p.budgetPct, 100) + '%" title="Target budget: ' + p.budgetPct + '%"></div>'
+          : '';
+        var cac = t.purchases ? t.spend / t.purchases : null;
+        var cacHtml = cac !== null
+          ? '<span class="cac-pill status-' + cacStatus(cac, p.targetCAC) + '">' + fmtEUR(cac, 2) + '</span>'
+          : '<span class="cac-pill status-muted">0 acquisti</span>';
+        return '<div class="bar-row">' +
+          '<div class="bar-name"><span class="dot" style="background:' + colorFor(p.name) + '"></span>' +
+          '<span class="label">' + p.name + '</span>' +
+          (p.isNew ? '<span class="new-badge">NEW</span>' : '') + '</div>' +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + widthPct + '%; background:' + colorFor(p.name) + '"></div>' + tickHtml + '</div>' +
+          '<div class="bar-values">' + fmtEUR(t.spend, 0) + '<span class="pct">' + fmtPct(pct) + '</span></div>' +
+          '<div class="bar-cac">' + cacHtml + '</div>' +
+          '</div>';
+      }).join('');
+
+      if (zero.length) {
+        zeroStrip.style.display = '';
+        zeroPills.innerHTML = zero.map(function (p) {
+          var budgetNote = (p.budgetPct !== null && p.budgetPct !== undefined)
+            ? '<span class="budget-note">(target budget ' + p.budgetPct + '%)</span>'
+            : '<span class="budget-note">(non pianificato su Meta)</span>';
+          return '<div class="zero-pill">' + p.name + (p.isNew ? ' <span class="new-badge">NEW</span>' : '') + ' ' + budgetNote + '</div>';
+        }).join('');
+      } else {
+        zeroStrip.style.display = 'none';
+      }
+    }
+
+    DASH.rerenders.push(render);
+    render();
+  })();
+
+  // ---------- Trend chart ----------
+  (function () {
+    var productSelect = document.getElementById('trendProduct');
+    var metricBtns = Array.prototype.slice.call(document.querySelectorAll('.metric-btn'));
+    var svg = document.getElementById('trendChart');
+    var tooltip = document.getElementById('trendTooltip');
+
+    var state = { product: 'all', metric: 'spend' };
+
+    var allOpt = document.createElement('option');
+    allOpt.value = 'all'; allOpt.textContent = 'Tutti i prodotti';
+    productSelect.appendChild(allOpt);
+    PRODUCTS_META.forEach(function (p) {
+      var o = document.createElement('option');
+      o.value = p.name; o.textContent = p.name + (PRODUCTS_WITH_DATA.indexOf(p.name) === -1 ? ' (nessuna spesa)' : '');
+      productSelect.appendChild(o);
+    });
+
+    function seriesForState() {
+      var allDates = dateRangeList(DASH.start, DASH.end);
+      var rows = DAILY.filter(function (r) {
+        if (r[0] < DASH.start || r[0] > DASH.end) return false;
+        if (state.product !== 'all' && r[1] !== state.product) return false;
+        return true;
+      });
+      var bySpend = {}, byPurchases = {};
+      allDates.forEach(function (d) { bySpend[d] = 0; byPurchases[d] = 0; });
+      rows.forEach(function (r) {
+        bySpend[r[0]] += r[3];
+        byPurchases[r[0]] += r[4];
+      });
+      return allDates.map(function (d) {
+        var value;
+        if (state.metric === 'purchases') value = byPurchases[d];
+        else if (state.metric === 'cac') value = byPurchases[d] ? bySpend[d] / byPurchases[d] : 0;
+        else value = bySpend[d];
+        return [d, value, byPurchases[d]];
+      });
+    }
+
+    var W = 960, H = 300, padL = 54, padR = 12, padT = 14, padB = 30;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var svgNS = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs) {
+      var e = document.createElementNS(svgNS, tag);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      return e;
+    }
+
+    function render() {
+      var series = seriesForState();
+      var n = series.length;
+      var maxVal = Math.max.apply(null, series.map(function (d) { return d[1]; })) * 1.08 || 1;
+      var lineColor = state.product === 'all' ? 'var(--accent)' : colorFor(state.product);
+
+      function xAt(i) { return n > 1 ? padL + (i / (n - 1)) * plotW : padL + plotW / 2; }
+      function yAt(v) { return padT + plotH - (v / maxVal) * plotH; }
+
+      svg.innerHTML = '';
+
+      var gridSteps = 4;
+      for (var g = 0; g <= gridSteps; g++) {
+        var v = maxVal * (g / gridSteps);
+        var y = yAt(v);
+        svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: y, y2: y, class: 'gridline' }));
+        var label = el('text', { x: padL - 8, y: y + 3, class: 'axis-label', 'text-anchor': 'end' });
+        if (state.metric === 'purchases') label.textContent = fmtInt(Math.round(v));
+        else if (state.metric === 'cac') label.textContent = fmtEUR(v, 0);
+        else label.textContent = '€' + Math.round(v / 1000 * 10) / 10 + 'k';
+        svg.appendChild(label);
+      }
+
+      var tickStep = Math.max(1, Math.round(n / 8));
+      for (var i = 0; i < n; i += tickStep) {
+        var lbl = el('text', { x: xAt(i), y: H - 8, class: 'axis-label', 'text-anchor': 'middle' });
+        var d0 = new Date(series[i][0] + 'T00:00:00Z');
+        lbl.textContent = d0.getUTCDate() + '/' + (d0.getUTCMonth() + 1);
+        svg.appendChild(lbl);
+      }
+      var lastLbl = el('text', { x: xAt(n - 1), y: H - 8, class: 'axis-label', 'text-anchor': 'end' });
+      var dl = new Date(series[n - 1][0] + 'T00:00:00Z');
+      lastLbl.textContent = dl.getUTCDate() + '/' + (dl.getUTCMonth() + 1);
+      svg.appendChild(lastLbl);
+
+      var areaPts = series.map(function (d, i) { return xAt(i) + ',' + yAt(d[1]); }).join(' L ');
+      var areaPath = 'M ' + xAt(0) + ',' + yAt(0) + ' L ' + areaPts + ' L ' + xAt(n - 1) + ',' + yAt(0) + ' Z';
+      svg.appendChild(el('path', { d: areaPath, fill: lineColor, opacity: '0.09', stroke: 'none' }));
+
+      var linePts = series.map(function (d, i) { return xAt(i) + ',' + yAt(d[1]); }).join(' L ');
+      svg.appendChild(el('path', { d: 'M ' + linePts, fill: 'none', stroke: lineColor, 'stroke-width': '2', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+
+      svg.appendChild(el('circle', { cx: xAt(n - 1), cy: yAt(series[n - 1][1]), r: 4, fill: lineColor }));
+
+      var crosshair = el('line', { x1: 0, x2: 0, y1: padT, y2: H - padB, class: 'crosshair' });
+      svg.appendChild(crosshair);
+      var dot = el('circle', { class: 'dot-main', fill: lineColor });
+      svg.appendChild(dot);
+
+      var colW = plotW / n;
+      series.forEach(function (d, i) {
+        var rect = el('rect', { x: xAt(i) - colW / 2, y: padT, width: colW, height: plotH, class: 'hover-col' });
+        rect.addEventListener('mouseenter', function () { showPoint(i); });
+        svg.appendChild(rect);
+      });
+      svg.addEventListener('mouseleave', function () {
+        crosshair.style.opacity = 0; dot.style.opacity = 0; tooltip.style.opacity = 0;
+      });
+
+      function showPoint(i) {
+        var d = series[i];
+        var x = xAt(i);
+        crosshair.setAttribute('x1', x); crosshair.setAttribute('x2', x); crosshair.style.opacity = 1;
+        dot.setAttribute('cx', x); dot.setAttribute('cy', yAt(d[1])); dot.style.opacity = 1;
+
+        var dt = new Date(d[0] + 'T00:00:00Z');
+        var dateLabel = dt.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) + (d[0] === DASH.maxDate ? ' · parziale' : '');
+        var metricLabel = state.metric === 'purchases' ? 'Acquisti' : (state.metric === 'cac' ? 'CAC' : 'Spesa');
+        var valueLabel;
+        if (state.metric === 'purchases') valueLabel = fmtInt(d[1]);
+        else if (state.metric === 'cac') valueLabel = d[2] ? fmtEUR(d[1], 2) : 'N/D · 0 acquisti';
+        else valueLabel = fmtEUR(d[1], 0);
+        tooltip.innerHTML =
+          '<div class="t-date">' + dateLabel + '</div>' +
+          '<div class="t-row"><span class="k">' + metricLabel + '</span><span>' + valueLabel + '</span></div>';
+        tooltip.style.left = (x / W * 100) + '%';
+        tooltip.style.top = (yAt(d[1]) / H * 100) + '%';
+        tooltip.style.opacity = 1;
+      }
+    }
+
+    productSelect.addEventListener('change', function () { state.product = productSelect.value; render(); });
+    metricBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        metricBtns.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.metric = btn.getAttribute('data-metric');
+        render();
+      });
+    });
+
+    DASH.rerenders.push(render);
+    render();
+  })();
+
+  // ---------- Product x Country detail tree ----------
+  (function () {
+    var searchInput = document.getElementById('detailSearch');
+    var countrySelect = document.getElementById('detailCountry');
+    var sortSelect = document.getElementById('detailSortBy');
+    var expandAllBtn = document.getElementById('expandAllBtn');
+    var collapseAllBtn = document.getElementById('collapseAllBtn');
+    var body = document.getElementById('detailBody');
+    var countLabel = document.getElementById('detailCount');
+    var headRow = document.getElementById('detailHeadRow');
+
+    var ALL_DATES = [];
+
+    function rebuildDateHeaders() {
+      Array.prototype.slice.call(headRow.querySelectorAll('.detail-date-col, .detail-total-col')).forEach(function (th) { th.remove(); });
+      ALL_DATES.forEach(function (d) {
+        var th = document.createElement('th');
+        th.className = 'detail-date-col';
+        var dt = new Date(d + 'T00:00:00Z');
+        th.textContent = dt.getUTCDate() + '/' + (dt.getUTCMonth() + 1);
+        headRow.appendChild(th);
+      });
+      var totalTh = document.createElement('th');
+      totalTh.className = 'detail-total-col';
+      totalTh.textContent = 'Totale';
+      headRow.appendChild(totalTh);
+    }
+
+    var countries = Array.from(new Set(DAILY.map(function (r) { return r[2]; }))).sort();
+    var opt = document.createElement('option');
+    opt.value = 'all'; opt.textContent = 'Tutti i paesi';
+    countrySelect.appendChild(opt);
+    countries.forEach(function (c) {
+      var o = document.createElement('option');
+      o.value = c; o.textContent = countryLabel(c);
+      countrySelect.appendChild(o);
+    });
+
+    var state = { search: '', country: 'all', sortBy: 'spend' };
+    var openProducts = {};
+
+    function newNode(name) { return { name: name, spend: 0, purchases: 0, byDate: {} }; }
+    function addDate(node, date, spend, purchases) {
+      if (!node.byDate[date]) node.byDate[date] = { spend: 0, purchases: 0 };
+      node.byDate[date].spend += spend;
+      node.byDate[date].purchases += purchases;
+      node.spend += spend;
+      node.purchases += purchases;
+    }
+
+    function buildTree() {
+      var prods = {};
+      DAILY.forEach(function (r) {
+        var date = r[0], product = r[1], country = r[2], spend = r[3], purchases = r[4];
+        if (date < DASH.start || date > DASH.end) return;
+        if (state.country !== 'all' && country !== state.country) return;
+        if (!prods[product]) prods[product] = { name: product, spend: 0, purchases: 0, byDate: {}, countries: {} };
+        var pg = prods[product];
+        addDate(pg, date, spend, purchases);
+        if (!pg.countries[country]) pg.countries[country] = newNode(country);
+        var cg = pg.countries[country];
+        addDate(cg, date, spend, purchases);
+      });
+      return prods;
+    }
+
+    function sortNodes(arr) {
+      var by = state.sortBy;
+      return arr.slice().sort(function (a, b) {
+        if (by === 'name') return a.name.localeCompare(b.name);
+        if (by === 'purchases') return b.purchases - a.purchases;
+        return b.spend - a.spend;
+      });
+    }
+
+    function matchesSearch(name) {
+      if (!state.search) return true;
+      return name.toLowerCase().indexOf(state.search) !== -1;
+    }
+
+    function spendCellHtml(v) {
+      var val = v ? v.spend : 0;
+      if (!val) return '<span class="zero-val">–</span>';
+      return fmtEUR(val, 0);
+    }
+    function cacCellHtml(v) {
+      var val = v && v.purchases ? v.spend / v.purchases : null;
+      if (val === null) return '<span class="zero-val">–</span>';
+      return fmtEUR(val, 2);
+    }
+
+    function metricRows(node) {
+      var spendCells = ALL_DATES.map(function (d) {
+        return '<td class="detail-date-col">' + spendCellHtml(node.byDate[d]) + '</td>';
+      }).join('');
+      var cacCells = ALL_DATES.map(function (d) {
+        return '<td class="detail-date-col">' + cacCellHtml(node.byDate[d]) + '</td>';
+      }).join('');
+      var totalCac = node.purchases ? fmtEUR(node.spend / node.purchases, 2) : '<span class="zero-val">–</span>';
+      return {
+        spendRow: spendCells + '<td class="detail-total-col">' + fmtEUR(node.spend, 0) + '</td>',
+        cacRow: cacCells + '<td class="detail-total-col">' + totalCac + '</td>'
+      };
+    }
+
+    function grandTotal(nodes) {
+      var out = { spend: 0, purchases: 0, byDate: {} };
+      ALL_DATES.forEach(function (d) { out.byDate[d] = { spend: 0, purchases: 0 }; });
+      nodes.forEach(function (pg) {
+        out.spend += pg.spend; out.purchases += pg.purchases;
+        ALL_DATES.forEach(function (d) {
+          var v = pg.byDate[d];
+          if (v) { out.byDate[d].spend += v.spend; out.byDate[d].purchases += v.purchases; }
+        });
+      });
+      return out;
+    }
+
+    function productBadges(pg) {
+      var meta = PRODUCT_META_BY_NAME[pg.name];
+      var badges = '';
+      if (meta && meta.isNew) badges += '<span class="new-badge">NEW</span>';
+      var cac = pg.purchases ? pg.spend / pg.purchases : null;
+      var target = meta ? meta.targetCAC : null;
+      if (cac !== null) {
+        var status = cacStatus(cac, target);
+        badges += '<span class="cac-pill status-' + status + '">CAC ' + fmtEUR(cac, 2) + (target ? ' / target ' + fmtEUR(target, 2) : '') + '</span>';
+      } else if (pg.spend > 0) {
+        badges += '<span class="cac-pill status-muted">0 acquisti</span>';
+      }
+      if (meta && meta.budgetPct !== null && meta.budgetPct !== undefined) {
+        badges += '<span class="quota-pill">target budget ' + meta.budgetPct + '%</span>';
+      }
+      return badges;
+    }
+
+    function render() {
+      ALL_DATES = dateRangeList(DASH.start, DASH.end);
+      rebuildDateHeaders();
+
+      var tree = buildTree();
+      var searchActive = !!state.search;
+      var prodNames = Object.keys(tree).filter(function (p) {
+        return !searchActive || matchesSearch(p) || Object.keys(tree[p].countries).some(function (c) { return matchesSearch(countryLabel(c)); });
+      });
+      var prodNodes = sortNodes(prodNames.map(function (p) { return tree[p]; }));
+
+      var html = '';
+      var totalCombos = 0;
+      Object.keys(tree).forEach(function (p) { totalCombos += Object.keys(tree[p].countries).length; });
+
+      prodNodes.forEach(function (pg) {
+        var countryNodes = sortNodes(Object.keys(pg.countries).map(function (c) { return pg.countries[c]; }).map(function (n) {
+          return { name: countryLabel(n.name), spend: n.spend, purchases: n.purchases, byDate: n.byDate };
+        }));
+        if (searchActive) {
+          countryNodes = countryNodes.filter(function (c) { return matchesSearch(pg.name) || matchesSearch(c.name); });
+        }
+        if (searchActive && countryNodes.length === 0) return;
+
+        var productKey = pg.name;
+        var open = searchActive || !!openProducts[productKey];
+        var rows = metricRows(pg);
+        html += '<tr class="row-product row-metric-primary" data-key="' + productKey + '">' +
+          '<td><span class="name-cell"><span class="name-main"><button type="button" class="row-toggle' + (open ? ' open' : '') + '">▶</button>' +
+          '<span class="cat-pill"><span class="dot" style="background:' + colorFor(pg.name) + '"></span>' + pg.name + '</span>' +
+          '<span class="count-badge">' + countryNodes.length + ' paes' + (countryNodes.length === 1 ? 'e' : 'i') + '</span></span>' +
+          '<span class="name-badges">' + productBadges(pg) + '</span></span></td>' +
+          '<td class="detail-metric-col">Spesa</td>' + rows.spendRow + '</tr>';
+        html += '<tr class="row-product row-metric-secondary" data-key="' + productKey + '">' +
+          '<td></td><td class="detail-metric-col">CAC</td>' + rows.cacRow + '</tr>';
+
+        if (open) {
+          countryNodes.forEach(function (cn) {
+            var cRows = metricRows(cn);
+            html += '<tr class="row-country row-metric-primary"><td><span class="name-cell">' + cn.name + '</span></td>' +
+              '<td class="detail-metric-col">Spesa</td>' + cRows.spendRow + '</tr>';
+            html += '<tr class="row-country row-metric-secondary"><td></td>' +
+              '<td class="detail-metric-col">CAC</td>' + cRows.cacRow + '</tr>';
+          });
+        }
+      });
+
+      if (prodNodes.length) {
+        var total = grandTotal(prodNodes);
+        var totalRows = metricRows(total);
+        html += '<tr class="row-total row-metric-primary"><td><span class="name-cell">Totale</span></td>' +
+          '<td class="detail-metric-col">Spesa</td>' + totalRows.spendRow + '</tr>';
+        html += '<tr class="row-total row-metric-secondary"><td></td>' +
+          '<td class="detail-metric-col">CAC medio</td>' + totalRows.cacRow + '</tr>';
+      }
+
+      body.innerHTML = html || ('<tr><td colspan="' + (ALL_DATES.length + 3) + '" style="text-align:center; color:var(--ink-muted); padding:20px;">Nessun risultato</td></tr>');
+      countLabel.textContent = fmtInt(prodNodes.length) + ' prodott' + (prodNodes.length === 1 ? 'o' : 'i') + ' · ' + fmtInt(totalCombos) + ' combinazioni prodotto × paese';
+
+      Array.prototype.slice.call(body.querySelectorAll('tr.row-product[data-key]')).forEach(function (tr) {
+        tr.addEventListener('click', function () {
+          var key = tr.getAttribute('data-key');
+          openProducts[key] = !openProducts[key];
+          render();
+        });
+      });
+    }
+
+    searchInput.addEventListener('input', function () { state.search = searchInput.value.toLowerCase(); render(); });
+    countrySelect.addEventListener('change', function () { state.country = countrySelect.value; render(); });
+    sortSelect.addEventListener('change', function () { state.sortBy = sortSelect.value; render(); });
+    expandAllBtn.addEventListener('click', function () {
+      PRODUCTS_META.forEach(function (p) { openProducts[p.name] = true; });
+      render();
+    });
+    collapseAllBtn.addEventListener('click', function () {
+      openProducts = {}; render();
+    });
+
+    DASH.rerenders.push(render);
+    render();
+  })();
+
+})();
+</script>
