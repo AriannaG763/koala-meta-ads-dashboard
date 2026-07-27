@@ -260,9 +260,19 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 #detailTable .name-main { display: flex; align-items: center; gap: 6px; }
 #detailTable .name-badges { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-left: 22px; margin-top: 2px; width: 100%; }
 #detailTable .count-badge { color: var(--ink-muted); font-weight: 400; font-size: 11.5px; }
-#detailTable th.detail-metric-col, #detailTable td.detail-metric-col {
-  color: var(--ink-muted); font-size: 11px; border-right: 1px solid var(--border); white-space: nowrap;
+#detailTable th.detail-name-col, #detailTable td.detail-name-col {
+  position: sticky; left: 0; z-index: 2; background: var(--surface);
+  width: 280px; min-width: 280px; max-width: 280px; box-shadow: 1px 0 0 var(--border);
 }
+#detailTable th.detail-metric-col, #detailTable td.detail-metric-col {
+  color: var(--ink-muted); font-size: 11px; white-space: nowrap;
+  position: sticky; left: 280px; z-index: 2; background: var(--surface);
+  width: 84px; min-width: 84px; max-width: 84px; box-shadow: 1px 0 0 var(--border);
+}
+#detailTable thead th.detail-name-col, #detailTable thead th.detail-metric-col { z-index: 3; background: var(--paper); }
+#detailTable tr.row-product td.detail-name-col, #detailTable tr.row-product td.detail-metric-col,
+#detailTable tr.row-total td.detail-name-col, #detailTable tr.row-total td.detail-metric-col { background: var(--paper); }
+#detailTable tr.row-product:hover td.detail-name-col, #detailTable tr.row-product:hover td.detail-metric-col { background: var(--accent-wash); }
 #detailTable th.detail-date-col, #detailTable td.detail-date-col {
   text-align: right; font-variant-numeric: tabular-nums; font-size: 11px; padding: 6px 8px; white-space: nowrap;
 }
@@ -457,7 +467,8 @@ footer a { text-decoration: underline; text-underline-offset: 2px; }
   };
   function colorFor(name) { return PRODUCT_COLORS[name] || 'var(--prod-muted)'; }
 
-  var COUNTRY_LABELS = { AT: 'Austria (AT)', DE: 'Germania (DE)', ES: 'Spagna (ES)', FR: 'Francia (FR)', IT: 'Italia (IT)', unknown: 'Non specificato' };
+  var COUNTRY_LABELS = { DE_AT: 'Germania-Austria (DE-AT)', ES: 'Spagna (ES)', FR: 'Francia (FR)', IT: 'Italia (IT)', unknown: 'Non specificato' };
+  function countryBucket(c) { return (c === 'AT' || c === 'DE') ? 'DE_AT' : c; }
   function countryLabel(c) { return COUNTRY_LABELS[c] || c; }
 
   var PRODUCTS_WITH_DATA = Array.from(new Set(DAILY.map(function (r) { return r[1]; })));
@@ -810,7 +821,7 @@ footer a { text-decoration: underline; text-underline-offset: 2px; }
       headRow.appendChild(totalTh);
     }
 
-    var countries = Array.from(new Set(DAILY.map(function (r) { return r[2]; }))).sort();
+    var countries = Array.from(new Set(DAILY.map(function (r) { return countryBucket(r[2]); }))).sort();
     var opt = document.createElement('option');
     opt.value = 'all'; opt.textContent = 'Tutti i paesi';
     countrySelect.appendChild(opt);
@@ -835,7 +846,7 @@ footer a { text-decoration: underline; text-underline-offset: 2px; }
     function buildTree() {
       var prods = {};
       DAILY.forEach(function (r) {
-        var date = r[0], product = r[1], country = r[2], spend = r[3], purchases = r[4];
+        var date = r[0], product = r[1], country = countryBucket(r[2]), spend = r[3], purchases = r[4];
         if (date < DASH.start || date > DASH.end) return;
         if (state.country !== 'all' && country !== state.country) return;
         if (!prods[product]) prods[product] = { name: product, spend: 0, purchases: 0, byDate: {}, countries: {} };
@@ -946,20 +957,20 @@ footer a { text-decoration: underline; text-underline-offset: 2px; }
         var open = searchActive || !!openProducts[productKey];
         var rows = metricRows(pg);
         html += '<tr class="row-product row-metric-primary" data-key="' + productKey + '">' +
-          '<td><span class="name-cell"><span class="name-main"><button type="button" class="row-toggle' + (open ? ' open' : '') + '">▶</button>' +
+          '<td class="detail-name-col"><span class="name-cell"><span class="name-main"><button type="button" class="row-toggle' + (open ? ' open' : '') + '">▶</button>' +
           '<span class="cat-pill"><span class="dot" style="background:' + colorFor(pg.name) + '"></span>' + pg.name + '</span>' +
           '<span class="count-badge">' + countryNodes.length + ' paes' + (countryNodes.length === 1 ? 'e' : 'i') + '</span></span>' +
           '<span class="name-badges">' + productBadges(pg) + '</span></span></td>' +
           '<td class="detail-metric-col">Spesa</td>' + rows.spendRow + '</tr>';
         html += '<tr class="row-product row-metric-secondary" data-key="' + productKey + '">' +
-          '<td></td><td class="detail-metric-col">CAC</td>' + rows.cacRow + '</tr>';
+          '<td class="detail-name-col"></td><td class="detail-metric-col">CAC</td>' + rows.cacRow + '</tr>';
 
         if (open) {
           countryNodes.forEach(function (cn) {
             var cRows = metricRows(cn);
-            html += '<tr class="row-country row-metric-primary"><td><span class="name-cell">' + cn.name + '</span></td>' +
+            html += '<tr class="row-country row-metric-primary"><td class="detail-name-col"><span class="name-cell">' + cn.name + '</span></td>' +
               '<td class="detail-metric-col">Spesa</td>' + cRows.spendRow + '</tr>';
-            html += '<tr class="row-country row-metric-secondary"><td></td>' +
+            html += '<tr class="row-country row-metric-secondary"><td class="detail-name-col"></td>' +
               '<td class="detail-metric-col">CAC</td>' + cRows.cacRow + '</tr>';
           });
         }
@@ -968,9 +979,9 @@ footer a { text-decoration: underline; text-underline-offset: 2px; }
       if (prodNodes.length) {
         var total = grandTotal(prodNodes);
         var totalRows = metricRows(total);
-        html += '<tr class="row-total row-metric-primary"><td><span class="name-cell">Totale</span></td>' +
+        html += '<tr class="row-total row-metric-primary"><td class="detail-name-col"><span class="name-cell">Totale</span></td>' +
           '<td class="detail-metric-col">Spesa</td>' + totalRows.spendRow + '</tr>';
-        html += '<tr class="row-total row-metric-secondary"><td></td>' +
+        html += '<tr class="row-total row-metric-secondary"><td class="detail-name-col"></td>' +
           '<td class="detail-metric-col">CAC medio</td>' + totalRows.cacRow + '</tr>';
       }
 
