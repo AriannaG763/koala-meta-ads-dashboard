@@ -70,36 +70,46 @@ for (let i = 1; i < tcRows.length; i++) {
 if (!productsMeta.length) throw new Error('No products parsed from Target CAC sheet — header/column layout may have changed.');
 
 // --- "Dati Meta" tab: campaigns by day/country/product ---
-// header: Ad Name, Country, Date, Amount Spent, Purchases, Products, Date2
+// Columns are looked up by header name (not fixed position) since PMA-managed
+// columns get added/reordered over time — e.g. "Link Clicks" was inserted and
+// "Products" (manually maintained, not part of the PMA extraction) shifted right.
 const dmRows = parseCSV(fs.readFileSync(datiMetaPath, 'utf8'));
-const expectedHeader = ['Ad Name', 'Country', 'Date', 'Amount Spent', 'Purchases', 'Products'];
-const header = dmRows[0] || [];
-for (let i = 0; i < expectedHeader.length; i++) {
-  if ((header[i] || '').trim() !== expectedHeader[i]) {
-    throw new Error('Dati Meta header mismatch at column ' + i + ': expected "' + expectedHeader[i] + '", got "' + header[i] + '"');
-  }
+const dmHeader = (dmRows[0] || []).map(function (h) { return h.trim(); });
+function dmCol(name) {
+  var idx = dmHeader.indexOf(name);
+  if (idx === -1) throw new Error('Dati Meta: expected column "' + name + '" not found in header: ' + JSON.stringify(dmHeader));
+  return idx;
 }
+const COL_COUNTRY = dmCol('Country');
+const COL_DATE = dmCol('Date');
+const COL_SPEND = dmCol('Amount Spent');
+const COL_PURCHASES = dmCol('Purchases');
+const COL_LINK_CLICKS = dmCol('Link Clicks');
+const COL_PRODUCTS = dmCol('Products');
+const minCols = Math.max(COL_COUNTRY, COL_DATE, COL_SPEND, COL_PURCHASES, COL_LINK_CLICKS, COL_PRODUCTS) + 1;
 
 const agg = new Map();
 for (let i = 1; i < dmRows.length; i++) {
   const r = dmRows[i];
-  if (!r || r.length < 6) continue;
-  const country = (r[1] || '').trim() || 'unknown';
-  const dateStr = (r[2] || '').trim();
+  if (!r || r.length < minCols) continue;
+  const country = (r[COL_COUNTRY] || '').trim() || 'unknown';
+  const dateStr = (r[COL_DATE] || '').trim();
   const parts = dateStr.split('/');
   if (parts.length !== 3) continue;
   const mm = parts[0].padStart(2, '0'), dd = parts[1].padStart(2, '0'), yyyy = parts[2];
   const iso = yyyy + '-' + mm + '-' + dd;
-  const spend = parseFloat((r[3] || '0').replace('€', '')) || 0;
-  const purchases = parseFloat(r[4] || '0') || 0;
-  const key = (r[5] || '').trim();
+  const spend = parseFloat((r[COL_SPEND] || '0').replace('€', '')) || 0;
+  const purchases = parseFloat(r[COL_PURCHASES] || '0') || 0;
+  const linkClicks = parseFloat(r[COL_LINK_CLICKS] || '0') || 0;
+  const key = (r[COL_PRODUCTS] || '').trim();
   const friendly = keyToFriendly[key] || key;
 
   const k = iso + '|' + friendly + '|' + country;
   let e = agg.get(k);
-  if (!e) { e = [iso, friendly, country, 0, 0]; agg.set(k, e); }
+  if (!e) { e = [iso, friendly, country, 0, 0, 0]; agg.set(k, e); }
   e[3] += spend;
   e[4] += purchases;
+  e[5] += linkClicks;
 }
 if (!agg.size) throw new Error('No rows parsed from Dati Meta sheet.');
 
@@ -108,7 +118,7 @@ const daily = Array.from(agg.values()).sort(function (a, b) {
   if (a[1] !== b[1]) return a[1] < b[1] ? -1 : 1;
   return a[2] < b[2] ? -1 : a[2] > b[2] ? 1 : 0;
 });
-daily.forEach(function (e) { e[3] = Math.round(e[3] * 100) / 100; });
+daily.forEach(function (e) { e[3] = Math.round(e[3] * 100) / 100; e[5] = Math.round(e[5]); });
 
 fs.writeFileSync(outDir + '/productsMeta.json', JSON.stringify(productsMeta));
 fs.writeFileSync(outDir + '/daily.json', JSON.stringify(daily));
