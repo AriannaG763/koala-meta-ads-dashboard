@@ -1,11 +1,12 @@
-// Aggregates the two Google Sheet CSV exports (tabs "Target CAC" and "Dati Meta")
-// into the two compact arrays the dashboard template needs.
-// Run: node aggregate.js <target_cac.csv> <dati_meta.csv> <out_dir>
+// Aggregates the "Target CAC" and "Regole Prodotti" Google Sheet CSV exports plus the ad-level
+// Meta Ads API history (from fetch_meta.js) into the two compact arrays the dashboard template needs.
+// Run: node aggregate.js <target_cac.csv> <meta_history.json> <regole_prodotti.csv> <out_dir>
 const fs = require('fs');
 
 const targetCacPath = process.argv[2];
-const datiMetaPath = process.argv[3];
-const outDir = process.argv[4];
+const metaHistoryPath = process.argv[3];
+const rulesPath = process.argv[4];
+const outDir = process.argv[5];
 
 function parseCSV(text) {
   const rows = [];
@@ -69,41 +70,28 @@ for (let i = 1; i < tcRows.length; i++) {
 }
 if (!productsMeta.length) throw new Error('No products parsed from Target CAC sheet — header/column layout may have changed.');
 
-// --- "Dati Meta" tab: campaigns by day/country/product ---
-// Columns are looked up by header name (not fixed position) since PMA-managed
-// columns get added/reordered over time — e.g. "Link Clicks" was inserted and
-// "Products" (manually maintained, not part of the PMA extraction) shifted right.
-const dmRows = parseCSV(fs.readFileSync(datiMetaPath, 'utf8'));
-const dmHeader = (dmRows[0] || []).map(function (h) { return h.trim(); });
-function dmCol(name) {
-  var idx = dmHeader.indexOf(name);
-  if (idx === -1) throw new Error('Dati Meta: expected column "' + name + '" not found in header: ' + JSON.stringify(dmHeader));
-  return idx;
+// --- "Regole Prodotti" tab: ordered (text contained in the ad name -> product key) rules,
+// first match wins, case-sensitive; no match -> "Other". Maintained by hand in the sheet.
+const ruleRows = parseCSV(fs.readFileSync(rulesPath, 'utf8'));
+const rules = [];
+for (let i = 1; i < ruleRows.length; i++) {
+  const pattern = (ruleRows[i][0] || '').trim();
+  const productKey = (ruleRows[i][1] || '').trim();
+  if (pattern && productKey) rules.push([pattern, productKey]);
 }
-const COL_COUNTRY = dmCol('Country');
-const COL_DATE = dmCol('Date');
-const COL_SPEND = dmCol('Amount Spent');
-const COL_PURCHASES = dmCol('Purchases');
-const COL_LINK_CLICKS = dmCol('Link Clicks');
-const COL_PRODUCTS = dmCol('Products');
-const minCols = Math.max(COL_COUNTRY, COL_DATE, COL_SPEND, COL_PURCHASES, COL_LINK_CLICKS, COL_PRODUCTS) + 1;
+if (!rules.length) throw new Error('No rules parsed from Regole Prodotti sheet.');
+function productKeyOf(adName) {
+  for (const [pattern, productKey] of rules) {
+    if (adName.indexOf(pattern) !== -1) return productKey;
+  }
+  return 'Other';
+}
 
+// --- Meta Ads API history: [date, ad name, country, spend, purchases, link clicks] per row ---
 const agg = new Map();
-for (let i = 1; i < dmRows.length; i++) {
-  const r = dmRows[i];
-  if (!r || r.length < minCols) continue;
-  const country = (r[COL_COUNTRY] || '').trim() || 'unknown';
-  const dateStr = (r[COL_DATE] || '').trim();
-  const parts = dateStr.split('/');
-  if (parts.length !== 3) continue;
-  const mm = parts[0].padStart(2, '0'), dd = parts[1].padStart(2, '0'), yyyy = parts[2];
-  const iso = yyyy + '-' + mm + '-' + dd;
-  const spend = parseFloat((r[COL_SPEND] || '0').replace('€', '')) || 0;
-  const purchases = parseFloat(r[COL_PURCHASES] || '0') || 0;
-  const linkClicks = parseFloat(r[COL_LINK_CLICKS] || '0') || 0;
-  const key = (r[COL_PRODUCTS] || '').trim();
+for (const [iso, adName, country, spend, purchases, linkClicks] of JSON.parse(fs.readFileSync(metaHistoryPath, 'utf8'))) {
+  const key = productKeyOf(adName);
   const friendly = keyToFriendly[key] || key;
-
   const k = iso + '|' + friendly + '|' + country;
   let e = agg.get(k);
   if (!e) { e = [iso, friendly, country, 0, 0, 0]; agg.set(k, e); }
@@ -111,7 +99,7 @@ for (let i = 1; i < dmRows.length; i++) {
   e[4] += purchases;
   e[5] += linkClicks;
 }
-if (!agg.size) throw new Error('No rows parsed from Dati Meta sheet.');
+if (!agg.size) throw new Error('No rows in the Meta Ads API history.');
 
 const daily = Array.from(agg.values()).sort(function (a, b) {
   if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;

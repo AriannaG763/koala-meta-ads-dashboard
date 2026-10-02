@@ -1,5 +1,6 @@
 target_cac.csv
-dati_meta.csv
+regole.csv
+meta_history.json
 productsMeta.json
 daily.json
 meta-ads-dashboard.html

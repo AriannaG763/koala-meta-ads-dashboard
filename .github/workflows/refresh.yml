@@ -24,16 +24,32 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Restore Meta Ads history
+        uses: actions/cache/restore@v4
+        with:
+          path: meta_history.json
+          key: meta-history-${{ github.run_id }}
+          restore-keys: meta-history-
+
       - name: Fetch fresh data
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
         run: |
           curl -sS -f -L "https://docs.google.com/spreadsheets/d/1-yh66Yj4PVBH3nFpHnUnTFv1lIoB8rMzsJ9sy9WRjno/gviz/tq?tqx=out:csv&sheet=Target%20CAC" -o target_cac.csv
-          curl -sS -f -L "https://docs.google.com/spreadsheets/d/1-yh66Yj4PVBH3nFpHnUnTFv1lIoB8rMzsJ9sy9WRjno/gviz/tq?tqx=out:csv&sheet=Dati%20Meta" -o dati_meta.csv
-          wc -l target_cac.csv dati_meta.csv
+          curl -sS -f -L "https://docs.google.com/spreadsheets/d/1-yh66Yj4PVBH3nFpHnUnTFv1lIoB8rMzsJ9sy9WRjno/gviz/tq?tqx=out:csv&sheet=Regole%20Prodotti" -o regole.csv
+          node fetch_meta.js meta_history.json
+          wc -l target_cac.csv regole.csv
           head -1 target_cac.csv
-          head -1 dati_meta.csv
+          head -1 regole.csv
+
+      - name: Save Meta Ads history
+        uses: actions/cache/save@v4
+        with:
+          path: meta_history.json
+          key: meta-history-${{ github.run_id }}
 
       - name: Aggregate
-        run: node aggregate.js target_cac.csv dati_meta.csv .
+        run: node aggregate.js target_cac.csv meta_history.json regole.csv .
 
       - name: Build
         run: python3 build.py .
