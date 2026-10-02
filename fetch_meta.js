@@ -15,7 +15,8 @@ const AD_ACCOUNT = 'act_184244048859015';
 const API_VERSION = 'v26.0';
 const START_DATE = '2026-01-01';
 const WINDOW_DAYS = 28;
-const MAX_USAGE_PCT = 60;
+// Meta throttles at 100% of an hourly rolling window; a full fetch alone uses roughly 20-30%.
+const MAX_USAGE_PCT = 85;
 
 const TODAY_ROME = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 
@@ -67,30 +68,41 @@ async function waitForQuota() {
   }
 }
 
+// An async report job: ad-level x country x day is too big for synchronous requests. No spend filter:
+// zero-spend rows can still carry purchases Meta attributed to that day.
+async function runReportJob(since, until) {
+  for (let attempt = 1; ; attempt++) {
+    await waitForQuota();
+    const job = await call('POST', `${AD_ACCOUNT}/insights`, {
+      level: 'ad',
+      fields: 'ad_name,spend,actions',
+      breakdowns: 'country',
+      time_increment: '1',
+      time_range: JSON.stringify({ since, until }),
+    });
+    const started = Date.now();
+    let status;
+    for (;;) {
+      status = (await call('GET', job.report_run_id, { fields: 'async_status' })).async_status;
+      if (status !== 'Job Not Started' && status !== 'Job Started' && status !== 'Job Running') break;
+      if (Date.now() - started > 20 * 60 * 1000) { status = 'still running after 20 minutes'; break; }
+      await sleep(5000);
+    }
+    if (status === 'Job Completed') return job.report_run_id;
+    // Meta occasionally fails a report job for no visible reason; a new job usually goes through.
+    if (attempt >= 3) throw new Error(`Meta report job for ${since} -> ${until}: ${status} (${attempt} attempts)`);
+    console.log(`Meta report job for ${since} -> ${until}: ${status}, retrying in 30s`);
+    await sleep(30 * 1000);
+  }
+}
+
 // Row: [date, ad name, country ('unknown' when Meta can't attribute it), spend, purchases, link clicks]
 async function fetchRange(since, until) {
-  await waitForQuota();
-  // An async report job: ad-level x country x day is too big for synchronous requests. No spend filter:
-  // zero-spend rows can still carry purchases Meta attributed to that day.
-  const job = await call('POST', `${AD_ACCOUNT}/insights`, {
-    level: 'ad',
-    fields: 'ad_name,spend,actions',
-    breakdowns: 'country',
-    time_increment: '1',
-    time_range: JSON.stringify({ since, until }),
-  });
-  const started = Date.now();
-  for (;;) {
-    const st = await call('GET', job.report_run_id, { fields: 'async_status' });
-    if (st.async_status === 'Job Completed') break;
-    if (st.async_status === 'Job Failed' || st.async_status === 'Job Skipped') throw new Error('Meta report job ' + st.async_status);
-    if (Date.now() - started > 20 * 60 * 1000) throw new Error('Meta report job still not done after 20 minutes');
-    await sleep(5000);
-  }
+  const reportId = await runReportJob(since, until);
   const rows = [];
   const params = { limit: '500' };
   for (;;) {
-    const page = await call('GET', `${job.report_run_id}/insights`, params);
+    const page = await call('GET', `${reportId}/insights`, params);
     for (const r of page.data) {
       const acts = Object.fromEntries((r.actions || []).map((a) => [a.action_type, Number(a.value)]));
       const row = [r.date_start, r.ad_name, r.country, Number(r.spend), acts.omni_purchase || 0, acts.link_click || 0];
